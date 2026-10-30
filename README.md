@@ -2,7 +2,7 @@
 
 The purpose of this exercise is to check your knowledge and understanding Spring Boot technology.
 
-Duration: **15** hour
+Estimated workload of this exercise is **15 hrs**.
 
 ## Description
 
@@ -61,4 +61,4 @@ Your application must implement next layers:
 * Additionally, you may to using files to frond-end from `resources\templates\**`, or use yourself front-end.  
 * If you do not have enough time to implement all the requirements, you can choose to implement only part of the functionality. For example, you can focus on add, delete, and update for employees and not implement them for clients.
 
-Good luck. You have only 15 hours
+Good luck.
