@@ -21,6 +21,13 @@ public interface OrdersRepository extends JpaRepository<Orders, Long> {
     @EntityGraph(attributePaths = {"client", "employee"})
     Page<Orders> findByClientId(Long clientId, Pageable pageable);
 
+    /** The logged-in client's own orders (login name = email). */
+    @EntityGraph(attributePaths = {"client", "employee"})
+    Page<Orders> findByClientEmail(String email, Pageable pageable);
+
+    /** Ownership check, usable in @PreAuthorize expressions. */
+    boolean existsByIdAndClientEmail(Long id, String email);
+
     @EntityGraph(attributePaths = {"client", "employee"})
     Page<Orders> findByApproved(Boolean approved, Pageable pageable);
 

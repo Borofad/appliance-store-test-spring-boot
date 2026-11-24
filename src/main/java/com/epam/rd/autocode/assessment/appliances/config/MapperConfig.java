@@ -33,11 +33,11 @@ public class MapperConfig {
         // Appliance -> ApplianceDto, OrderRow -> OrderRowDto and Orders -> OrderDto: the ids and names of
         // related entities (manufacturerId, applianceName, clientId, employeeName, ...) are matched
         // automatically because the DTO property names follow the "<relation><Property>" pattern.
-        // Only the collection needs an explicit mapping, since its names differ (orderRowSet -> rows).
+        // The rows are skipped here: OrderServiceImpl fills them in itself (mapping each OrderRow).
         mapper.typeMap(Appliance.class, ApplianceDto.class);
         mapper.typeMap(OrderRow.class, OrderRowDto.class);
         mapper.typeMap(Orders.class, OrderDto.class)
-                .addMappings(m -> m.map(Orders::getOrderRowSet, OrderDto::setRows));
+                .addMappings(m -> m.skip(OrderDto::setRows));
 
         // ---------- DTO -> entity (simple fields only) ----------
         mapper.typeMap(ClientDto.class, Client.class).addMappings(m -> {
