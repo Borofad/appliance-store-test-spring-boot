@@ -17,6 +17,11 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     boolean existsByEmailAndIdNot(String email, Long id);
 
+    /** Case-insensitive variants (H2 compares case-sensitively, MySQL does not - keep behaviour identical). */
+    boolean existsByEmailIgnoreCase(String email);
+
+    boolean existsByEmailIgnoreCaseAndIdNot(String email, Long id);
+
     /** Search by name, email or department (case-insensitive) with pagination and sorting. */
     @Query("""
             select e from Employee e
