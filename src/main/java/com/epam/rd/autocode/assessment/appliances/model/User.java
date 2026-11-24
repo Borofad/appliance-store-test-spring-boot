@@ -1,6 +1,11 @@
 package com.epam.rd.autocode.assessment.appliances.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -10,9 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-@Entity
-@Table(name = "users")
-@Inheritance(strategy = InheritanceType.JOINED)
+@MappedSuperclass
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,7 +37,7 @@ public abstract class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    /** Stores the (BCrypt) hash. */
+    // Stores the (BCrypt) hash.
     @NotBlank(message = "{validation.user.password.required}")
     @Column(nullable = false)
     private String password;
