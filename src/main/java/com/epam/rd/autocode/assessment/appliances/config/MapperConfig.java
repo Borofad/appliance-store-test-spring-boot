@@ -30,14 +30,40 @@ public class MapperConfig {
         mapper.typeMap(Employee.class, EmployeeDto.class)
                 .addMappings(m -> m.skip(EmployeeDto::setPassword));
 
-        // Appliance -> ApplianceDto, OrderRow -> OrderRowDto and Orders -> OrderDto: the ids and names of
-        // related entities (manufacturerId, applianceName, clientId, employeeName, ...) are matched
-        // automatically because the DTO property names follow the "<relation><Property>" pattern.
+        mapper.typeMap(Appliance.class, ApplianceDto.class).setPostConverter(ctx -> {
+            Manufacturer manufacturer = ctx.getSource().getManufacturer();
+            if (manufacturer != null) {
+                ctx.getDestination().setManufacturerId(manufacturer.getId());
+                ctx.getDestination().setManufacturerName(manufacturer.getName());
+            }
+            return ctx.getDestination();
+        });
+
+        mapper.typeMap(OrderRow.class, OrderRowDto.class).setPostConverter(ctx -> {
+            Appliance appliance = ctx.getSource().getAppliance();
+            if (appliance != null) {
+                ctx.getDestination().setApplianceId(appliance.getId());
+                ctx.getDestination().setApplianceName(appliance.getName());
+            }
+            return ctx.getDestination();
+        });
+
         // The rows are skipped here: OrderServiceImpl fills them in itself (mapping each OrderRow).
-        mapper.typeMap(Appliance.class, ApplianceDto.class);
-        mapper.typeMap(OrderRow.class, OrderRowDto.class);
         mapper.typeMap(Orders.class, OrderDto.class)
-                .addMappings(m -> m.skip(OrderDto::setRows));
+                .addMappings(m -> m.skip(OrderDto::setRows))
+                .setPostConverter(ctx -> {
+                    Client client = ctx.getSource().getClient();
+                    if (client != null) {
+                        ctx.getDestination().setClientId(client.getId());
+                        ctx.getDestination().setClientName(client.getName());
+                    }
+                    Employee employee = ctx.getSource().getEmployee();
+                    if (employee != null) {
+                        ctx.getDestination().setEmployeeId(employee.getId());
+                        ctx.getDestination().setEmployeeName(employee.getName());
+                    }
+                    return ctx.getDestination();
+                });
 
         // ---------- DTO -> entity (simple fields only) ----------
         mapper.typeMap(ClientDto.class, Client.class).addMappings(m -> {
