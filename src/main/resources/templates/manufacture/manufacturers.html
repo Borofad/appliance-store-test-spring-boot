@@ -1,33 +1,69 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <!-- Latest compiled and minified CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Latest compiled JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <title>Manufacturers list</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(#{manufacturer.title})}"></head>
 <body>
-<div th:insert="~{menunavy::navy}"></div>
-<h1 th:text="#{manufacturer.header.list}"></h1>
-<table class="table table-hover">
-    <thead>
-    <tr class="table-dark">
-        <th th:text="#{object.manufacturer.id}">ID</th>
-        <th th:text="#{object.manufacturer.name}">Name</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="manufacturer: ${manufacturers}">
-        <td th:text="${manufacturer.id}"/>
-        <td th:text="${manufacturer.name}"/>
-    </tr>
+<div th:replace="~{menunavy :: navy}"></div>
+<div class="container mt-4">
 
-    </tbody>
-</table>
-<a th:href="@{manufacturers/add}" class="btn btn-primary" th:text="#{manufacturer.btn.new}"></a>
-<div th:insert="~{footer::footer}"></div>
+    <div class="alert alert-success" th:if="${param.created}" th:text="#{message.created}"></div>
+    <div class="alert alert-success" th:if="${param.updated}" th:text="#{message.updated}"></div>
+    <div class="alert alert-success" th:if="${param.deleted}" th:text="#{message.deleted}"></div>
+    <div class="alert alert-danger" th:if="${param.deleteFailed}" th:text="#{error.manufacturer.inUse}"></div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0" th:text="#{manufacturer.title}">Manufacturers</h1>
+        <a class="btn btn-primary" th:href="@{/manufacturers/new}" th:text="#{button.add}">Add</a>
+    </div>
+
+    <!-- search and page size -->
+    <form class="row g-2 mb-3" method="get" th:action="@{/manufacturers}">
+        <div class="col-sm-6 col-md-5">
+            <input type="text" name="query" class="form-control" maxlength="100"
+                   th:value="${query}" th:placeholder="#{label.search.placeholder}">
+        </div>
+        <div class="col-auto">
+            <select name="size" class="form-select" th:title="#{label.pageSize}">
+                <option th:each="s : ${pageSizes}" th:value="${s}" th:text="${s}" th:selected="${s == size}">10</option>
+            </select>
+        </div>
+        <input type="hidden" name="sortField" th:value="${sortField}">
+        <input type="hidden" name="sortDir" th:value="${sortDir}">
+        <div class="col-auto">
+            <button type="submit" class="btn btn-outline-primary" th:text="#{button.search}">Search</button>
+            <a class="btn btn-outline-secondary" th:href="@{/manufacturers}" th:text="#{button.reset}">Reset</a>
+        </div>
+    </form>
+
+    <p th:if="${page.empty}" class="text-muted" th:text="#{label.noData}">No data to display</p>
+
+    <table class="table table-striped align-middle" th:unless="${page.empty}">
+        <thead>
+        <tr>
+            <th:block th:replace="~{fragments/table :: sortHeader('/manufacturers', 'id', #{label.id})}"></th:block>
+            <th:block th:replace="~{fragments/table :: sortHeader('/manufacturers', 'name', #{manufacturer.name})}"></th:block>
+            <th th:text="#{label.actions}">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="m : ${page.content}">
+            <td th:text="${m.id}">1</td>
+            <td th:text="${m.name}">Samsung</td>
+            <td class="text-nowrap">
+                <a class="btn btn-sm btn-outline-primary" th:href="@{/manufacturers/{id}/edit(id=${m.id})}"
+                   th:text="#{button.edit}">Edit</a>
+                <form class="d-inline" method="post" th:action="@{/manufacturers/{id}/delete(id=${m.id})}"
+                      th:onsubmit="|return confirm('#{label.confirmDelete}');|">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{button.delete}">Delete</button>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted" th:text="#{label.total(${page.totalElements})}">Total: 7</span>
+        <div th:replace="~{fragments/table :: pagination(${page}, '/manufacturers')}"></div>
+    </div>
+</div>
 </body>
 </html>

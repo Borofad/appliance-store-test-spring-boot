@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<!--
+  Reusable list-page pieces. They read these model attributes, which list controllers provide:
+  query, size, sortField, sortDir  (and the Page object is passed as a parameter).
+-->
+<body>
+
+<!-- Sortable column header. Clicking it sorts by that field, clicking again reverses the order. -->
+<th th:fragment="sortHeader(url, field, label)">
+    <a class="text-decoration-none text-dark"
+       th:href="@{${url}(sortField=${field}, sortDir=${sortField == field and sortDir == 'asc' ? 'desc' : 'asc'}, query=${query}, size=${size}, page=0)}">
+        <span th:text="${label}">Name</span>
+        <span th:if="${sortField == field and sortDir == 'asc'}">&#9650;</span>
+        <span th:if="${sortField == field and sortDir == 'desc'}">&#9660;</span>
+    </a>
+</th>
+
+<!-- Page links: previous, a window of up to 5 page numbers around the current page, next. -->
+<nav th:fragment="pagination(page, url)" th:if="${page.totalPages > 1}"
+     th:with="from=${page.number > 2 ? page.number - 2 : 0},
+              to=${page.number + 2 < page.totalPages - 1 ? page.number + 2 : page.totalPages - 1}">
+    <ul class="pagination">
+        <li class="page-item" th:classappend="${page.first} ? 'disabled'">
+            <a class="page-link" th:text="#{label.previous}"
+               th:href="@{${url}(page=${page.number - 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, query=${query})}">Previous</a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(from, to)}"
+            th:classappend="${i == page.number} ? 'active'">
+            <a class="page-link" th:text="${i + 1}"
+               th:href="@{${url}(page=${i}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, query=${query})}">1</a>
+        </li>
+        <li class="page-item" th:classappend="${page.last} ? 'disabled'">
+            <a class="page-link" th:text="#{label.next}"
+               th:href="@{${url}(page=${page.number + 1}, size=${size}, sortField=${sortField}, sortDir=${sortDir}, query=${query})}">Next</a>
+        </li>
+    </ul>
+</nav>
+
+</body>
+</html>
