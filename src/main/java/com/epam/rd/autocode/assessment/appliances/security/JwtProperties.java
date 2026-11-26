@@ -25,4 +25,11 @@ public class JwtProperties {
     /** How long a token stays valid, e.g. 30m. */
     @NotNull
     private Duration expiration = Duration.ofMinutes(30);
+
+    /** Name of the cookie that carries the token in the browser. */
+    @NotBlank
+    private String cookieName = "APPLIANCES_JWT";
+
+    /** Send the cookie only over HTTPS. Must be true in production, false for plain http in development. */
+    private boolean cookieSecure = false;
 }
