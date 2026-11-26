@@ -13,6 +13,9 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     Optional<Client> findByEmail(String email);
 
+    /** Login lookup: users type their email in any letter case. */
+    Optional<Client> findByEmailIgnoreCase(String email);
+
     boolean existsByEmail(String email);
 
     boolean existsByEmailAndIdNot(String email, Long id);

@@ -13,6 +13,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     Optional<Employee> findByEmail(String email);
 
+    /** Login lookup: users type their email in any letter case. */
+    Optional<Employee> findByEmailIgnoreCase(String email);
+
     boolean existsByEmail(String email);
 
     boolean existsByEmailAndIdNot(String email, Long id);
