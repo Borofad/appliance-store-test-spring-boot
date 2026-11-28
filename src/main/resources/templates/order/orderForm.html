@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--
+  The order form, shared by newOrder.html and editOrder.html.
+  The whole form (client, every row) is posted each time. "Add item" and "Remove" post it back
+  with an action, so no server session is needed. Needs the model attributes:
+  order, editing, employeeView, appliances and (for employees creating an order) clients.
+-->
+<form th:fragment="orderForm" method="post" th:object="${order}" novalidate
+      th:action="${editing} ? @{/orders/{id}(id=${order.id})} : @{/orders}">
+
+    <!-- the first submit button of a form is what the Enter key presses: it must be "save", never "remove" -->
+    <button type="submit" class="visually-hidden" tabindex="-1" aria-hidden="true">Save</button>
+
+    <!-- who the order is for: employees choose it when creating; otherwise it is shown or implied -->
+    <div class="mb-3" th:if="${employeeView and !editing}">
+        <label for="clientId" class="form-label" th:text="#{orders.client}">Client</label>
+        <select id="clientId" class="form-select" th:field="*{clientId}" th:errorclass="is-invalid">
+            <option value="" th:text="#{label.choose}">-- Choose --</option>
+            <option th:each="c : ${clients}" th:value="${c.id}" th:text="|${c.name} (${c.email})|">Mercury</option>
+        </select>
+        <div class="invalid-feedback" th:errors="*{clientId}">Client error</div>
+    </div>
+    <p th:if="${editing}">
+        <strong th:text="#{orders.client}">Client</strong>: <span th:text="${order.clientName}">Mercury</span>
+    </p>
+
+    <h2 class="h5" th:text="#{orders.rows}">Order items</h2>
+    <table class="table align-middle">
+        <thead>
+        <tr>
+            <th th:text="#{orderRow.appliance}">Appliance</th>
+            <th style="width: 180px;" th:text="#{orderRow.number}">Quantity</th>
+            <th style="width: 1%;"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="row, stat : *{rows}">
+            <td>
+                <select class="form-select" th:field="*{rows[__${stat.index}__].applianceId}" th:errorclass="is-invalid">
+                    <option value="" th:text="#{label.choose}">-- Choose --</option>
+                    <option th:each="a : ${appliances}" th:value="${a.id}"
+                            th:text="|${a.name} (${a.manufacturerName}) - ${#numbers.formatDecimal(a.price, 1, 2)}|">Claw</option>
+                </select>
+                <div class="invalid-feedback" th:errors="*{rows[__${stat.index}__].applianceId}">Appliance error</div>
+            </td>
+            <td>
+                <input type="number" class="form-control" min="1" step="1"
+                       th:field="*{rows[__${stat.index}__].number}" th:errorclass="is-invalid">
+                <div class="invalid-feedback" th:errors="*{rows[__${stat.index}__].number}">Quantity error</div>
+            </td>
+            <td class="text-nowrap">
+                <button type="submit" name="removeRow" th:value="${stat.index}" formnovalidate
+                        class="btn btn-sm btn-outline-danger" th:text="#{orders.removeRow}">Remove</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button type="submit" name="addRow" value="1" formnovalidate class="btn btn-outline-secondary"
+            th:text="#{orders.addRow}">Add item</button>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-primary" th:text="#{button.save}">Save</button>
+        <a class="btn btn-outline-secondary" th:href="@{/orders}" th:text="#{button.cancel}">Cancel</a>
+    </div>
+</form>
+</body>
+</html>

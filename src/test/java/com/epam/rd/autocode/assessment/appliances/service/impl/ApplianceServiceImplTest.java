@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -190,5 +191,17 @@ class ApplianceServiceImplTest {
         when(applianceRepository.findById(9L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(9L));
+    }
+
+    @Test
+    void findAll_returnsEveryApplianceMappedWithItsManufacturer() {
+        when(applianceRepository.findAll(any(Sort.class)))
+                .thenReturn(List.of(appliance(1L, "Kettle"), appliance(2L, "Oven")));
+
+        List<ApplianceDto> result = service.findAll();
+
+        assertEquals(2, result.size());
+        assertEquals("Kettle", result.get(0).getName());
+        assertEquals("Samsung", result.get(0).getManufacturerName());
     }
 }

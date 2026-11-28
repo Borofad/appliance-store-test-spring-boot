@@ -4,10 +4,15 @@ import com.epam.rd.autocode.assessment.appliances.dto.ApplianceDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface ApplianceService {
 
     /** Paged, sorted search by appliance name, model or manufacturer name; empty query returns everything. */
     Page<ApplianceDto> search(String query, Pageable pageable);
+
+    /** All appliances sorted by name (for dropdowns). */
+    List<ApplianceDto> findAll();
 
     ApplianceDto findById(Long id);
 

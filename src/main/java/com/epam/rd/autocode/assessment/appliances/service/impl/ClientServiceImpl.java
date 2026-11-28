@@ -15,9 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -34,6 +37,11 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public Page<ClientDto> search(String query, Pageable pageable) {
         return clientRepository.search(SearchUtils.normalize(query), pageable).map(this::toDto);
+    }
+
+    @Override
+    public List<ClientDto> findAll() {
+        return clientRepository.findAll(Sort.by("name")).stream().map(this::toDto).toList();
     }
 
     @Override

@@ -15,8 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -32,6 +35,11 @@ public class ApplianceServiceImpl implements ApplianceService {
     @Override
     public Page<ApplianceDto> search(String query, Pageable pageable) {
         return applianceRepository.search(SearchUtils.normalize(query), pageable).map(this::toDto);
+    }
+
+    @Override
+    public List<ApplianceDto> findAll() {
+        return applianceRepository.findAll(Sort.by("name")).stream().map(this::toDto).toList();
     }
 
     @Override

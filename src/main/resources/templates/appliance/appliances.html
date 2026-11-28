@@ -62,6 +62,8 @@
                 <td th:text="${a.power}">600</td>
                 <td th:text="${#numbers.formatDecimal(a.price, 1, 2)}">1.01</td>
                 <td class="text-nowrap">
+                    <a class="btn btn-sm btn-success" th:href="@{/orders/new(applianceId=${a.id})}"
+                       th:text="#{button.order}">Order</a>
                     <a class="btn btn-sm btn-outline-primary" th:href="@{/appliances/{id}/edit(id=${a.id})}"
                        th:text="#{button.edit}">Edit</a>
                     <form class="d-inline" method="post" th:action="@{/appliances/{id}/delete(id=${a.id})}"

@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -229,5 +230,16 @@ class ClientServiceImplTest {
         when(clientRepository.findById(9L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> service.delete(9L));
+    }
+
+    @Test
+    void findAll_returnsEveryClientMapped_withoutPasswords() {
+        when(clientRepository.findAll(any(Sort.class))).thenReturn(List.of(client(1L), client(2L)));
+
+        List<ClientDto> result = service.findAll();
+
+        assertEquals(2, result.size());
+        assertEquals("Anna", result.get(0).getName());
+        assertNull(result.get(0).getPassword());
     }
 }
