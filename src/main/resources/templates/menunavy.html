@@ -1,44 +1,70 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
+
+<!-- Main navigation for logged-in users. Each role sees only the items it may use. -->
 <div th:fragment="navy">
-    <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
+    <nav class="navbar navbar-expand-md bg-primary navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" th:href="@{/}" th:text="#{app.title}"></a>
-            <div class="collapse navbar-collapse">
-                <ul class="navbar-nav">
+            <a class="navbar-brand" th:href="@{/}" th:text="#{app.title}">Appliance Store</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                    aria-controls="mainNav" aria-expanded="false" th:attr="aria-label=#{nav.toggle}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav me-auto">
+                    <!-- both roles -->
                     <li class="nav-item">
-                        <a class="nav-link" th:href="@{/clients}" th:text="#{nav.clients}"></a>
+                        <a class="nav-link" th:href="@{/appliances}" th:text="#{nav.appliances}">Appliances</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/employees}" th:text="#{nav.employees}"></a>
+                    <li class="nav-item" sec:authorize="hasRole('CLIENT')">
+                        <a class="nav-link" th:href="@{/orders}" th:text="#{nav.myOrders}">My orders</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/manufacturers}" th:text="#{nav.manufacturers}"></a>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" th:href="@{/orders}" th:text="#{nav.orders}">Orders</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/appliances}" th:text="#{nav.appliances}"></a>
+                    <!-- employees only -->
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" th:href="@{/manufacturers}" th:text="#{nav.manufacturers}">Manufacturers</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" th:href="@{/orders}" th:text="#{nav.orders}"></a>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" th:href="@{/clients}" th:text="#{nav.clients}">Clients</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('EMPLOYEE')">
+                        <a class="nav-link" th:href="@{/employees}" th:text="#{nav.employees}">Employees</a>
                     </li>
                 </ul>
-                <ul class="navbar-nav" style="margin-left: auto;">
+
+                <ul class="navbar-nav align-items-md-center">
+                    <!-- language switcher: stays on the current page, only changes the language -->
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{''(lang='en')}">EN</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" th:href="@{''(lang='uk')}">UA</a>
                     </li>
+                    <th:block sec:authorize="isAuthenticated()">
+                        <li class="nav-item navbar-text mx-md-2"
+                            th:text="#{label.welcome(${#authentication.principal.name})}">Welcome!</li>
+                        <li class="nav-item">
+                            <!-- logout is a POST (with the CSRF token that th:action adds) -->
+                            <form class="d-inline" method="post" th:action="@{/logout}">
+                                <button type="submit" class="btn btn-outline-light btn-sm" th:text="#{nav.logout}">Log out</button>
+                            </form>
+                        </li>
+                    </th:block>
                 </ul>
             </div>
         </div>
     </nav>
 </div>
+
+<!-- Plain title bar without a menu, for the login page and the error pages. -->
 <div th:fragment="line">
     <nav class="navbar navbar-expand-sm bg-primary navbar-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#" th:text="#{app.title}"></a>
+            <a class="navbar-brand" href="#" th:text="#{app.title}">Appliance Store</a>
         </div>
     </nav>
 </div>

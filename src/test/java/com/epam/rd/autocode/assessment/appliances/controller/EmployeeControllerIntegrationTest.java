@@ -36,6 +36,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * The Employees pages end to end (real security, templates, validation messages, password hashing, seeded H2 data).
+ * The navigation bar shows the logged-in employee's name (Phobos) at the top of every page, so tests that
+ * tell table rows apart by name use Moon, who is NOT logged in.
  * Every test is rolled back. Seed data: 4 employees - Phobos (id 1, salle, the logged-in user in these tests),
  * Moon (2, salle), Deimos (3, security), Europa (4, security) - all with a demo password; 8 clients; no orders.
  */
@@ -155,14 +157,14 @@ class EmployeeControllerIntegrationTest {
     void list_search_findsByName_ignoringCase() throws Exception {
         mockMvc.perform(get("/employees").param("query", "dEiM").cookie(employee))
                 .andExpect(content().string(containsString("Deimos")))
-                .andExpect(content().string(not(containsString("Phobos"))));
+                .andExpect(content().string(not(containsString("Moon"))));
     }
 
     @Test
     void list_search_findsByEmail() throws Exception {
         mockMvc.perform(get("/employees").param("query", "europa@").cookie(employee))
                 .andExpect(content().string(containsString("Europa")))
-                .andExpect(content().string(not(containsString("Phobos"))));
+                .andExpect(content().string(not(containsString("Moon"))));
     }
 
     @Test
@@ -170,7 +172,7 @@ class EmployeeControllerIntegrationTest {
         mockMvc.perform(get("/employees").param("query", "secur").cookie(employee))
                 .andExpect(content().string(containsString("Deimos")))
                 .andExpect(content().string(containsString("Europa")))
-                .andExpect(content().string(not(containsString("Phobos"))));
+                .andExpect(content().string(not(containsString("Moon"))));
     }
 
     @Test
@@ -200,18 +202,18 @@ class EmployeeControllerIntegrationTest {
         MvcResult desc = mockMvc.perform(get("/employees")
                 .param("sortField", "name").param("sortDir", "desc").cookie(employee)).andReturn();
 
-        assertTrue(html(asc).indexOf("Deimos") < html(asc).indexOf("Phobos"));
-        assertTrue(html(desc).indexOf("Phobos") < html(desc).indexOf("Deimos"));
+        assertTrue(html(asc).indexOf("Deimos") < html(asc).indexOf("Moon"));
+        assertTrue(html(desc).indexOf("Moon") < html(desc).indexOf("Deimos"));
     }
 
     @Test
     void list_sortingByDepartment_works() throws Exception {
-        // "salle" (Phobos) sorts before "security" (Deimos)
+        // "salle" (Moon) sorts before "security" (Deimos)
         MvcResult asc = mockMvc.perform(get("/employees")
                         .param("sortField", "department").param("sortDir", "asc").cookie(employee))
                 .andExpect(status().isOk()).andReturn();
 
-        assertTrue(html(asc).indexOf("Phobos") < html(asc).indexOf("Deimos"));
+        assertTrue(html(asc).indexOf("Moon") < html(asc).indexOf("Deimos"));
     }
 
     @Test

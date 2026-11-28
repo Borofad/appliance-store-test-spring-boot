@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="~{fragments/head :: head(#{appliance.title})}"></head>
 <body>
 <div th:replace="~{menunavy :: navy}"></div>
@@ -12,7 +12,7 @@
 
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="h3 mb-0" th:text="#{appliance.title}">Appliances</h1>
-        <a class="btn btn-primary" th:href="@{/appliances/new}" th:text="#{button.add}">Add</a>
+        <a class="btn btn-primary" th:href="@{/appliances/new}" sec:authorize="hasRole('EMPLOYEE')" th:text="#{button.add}">Add</a>
     </div>
 
     <!-- search and page size -->
@@ -64,9 +64,9 @@
                 <td class="text-nowrap">
                     <a class="btn btn-sm btn-success" th:href="@{/orders/new(applianceId=${a.id})}"
                        th:text="#{button.order}">Order</a>
-                    <a class="btn btn-sm btn-outline-primary" th:href="@{/appliances/{id}/edit(id=${a.id})}"
+                    <a class="btn btn-sm btn-outline-primary" th:href="@{/appliances/{id}/edit(id=${a.id})}" sec:authorize="hasRole('EMPLOYEE')"
                        th:text="#{button.edit}">Edit</a>
-                    <form class="d-inline" method="post" th:action="@{/appliances/{id}/delete(id=${a.id})}"
+                    <form class="d-inline" method="post" th:action="@{/appliances/{id}/delete(id=${a.id})}" sec:authorize="hasRole('EMPLOYEE')"
                           th:onsubmit="|return confirm('#{label.confirmDelete}');|">
                         <button type="submit" class="btn btn-sm btn-outline-danger" th:text="#{button.delete}">Delete</button>
                     </form>

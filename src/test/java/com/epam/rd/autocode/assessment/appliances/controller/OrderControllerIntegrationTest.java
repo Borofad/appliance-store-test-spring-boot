@@ -39,6 +39,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * The Orders pages end to end: real security (login cookie, CSRF), real templates, validation messages,
  * the ownership rules and the seeded H2 data. Every test is rolled back.
  *
+ * The navigation bar shows the logged-in user's name at the top of every page, so tests that check the
+ * "approved by" name look at the order as the client (Mercury), not as the employee (Phobos).
+ *
  * Seed data used here: employee Phobos (id 1, logged in as "employee"); clients Mercury (id 1, logged in as
  * "mercury") and Venus (id 2); appliances Claw (id 1, price 1.01, Samsung), Bane (id 2, 2.01), Ecu (id 3, 3.01).
  * No orders exist at the start. Orders are created through the repositories or through the real form.
@@ -179,9 +182,10 @@ class OrderControllerIntegrationTest {
     @Test
     void list_showsStatusApproverAndTotal() throws Exception {
         placeOrder(mercuryClient(), 1, 3);                 // 3 x 1.01 = 3.03, pending
-        placeApprovedOrder(venusClient(), 2, 1);           // approved by Phobos
+        placeApprovedOrder(mercuryClient(), 2, 1);         // approved by Phobos
 
-        mockMvc.perform(get("/orders").cookie(employee))
+        // seen by the client, so "Phobos" can only come from the "approved by" column (the navbar shows "Mercury")
+        mockMvc.perform(get("/orders").cookie(mercury))
                 .andExpect(content().string(containsString("Pending")))
                 .andExpect(content().string(containsString("Approved")))
                 .andExpect(content().string(containsString("3.03")))
@@ -343,18 +347,27 @@ class OrderControllerIntegrationTest {
     }
 
     @Test
-    void details_ofAnApprovedOrder_offersNoChanges_andNamesTheApprover() throws Exception {
+    void details_ofAnApprovedOrder_offersNoChanges() throws Exception {
         Orders order = placeApprovedOrder(mercuryClient(), 1, 1);
 
         MvcResult result = mockMvc.perform(get("/orders/" + order.getId()).cookie(employee))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Approved")))
-                .andExpect(content().string(containsString("Phobos")))
                 .andReturn();
 
         assertFalse(html(result).contains("/edit"));
         assertFalse(html(result).contains("/delete"));
         assertFalse(html(result).contains("/approve"));
+    }
+
+    @Test
+    void details_ofAnApprovedOrder_namesTheApproverToTheClient() throws Exception {
+        Orders order = placeApprovedOrder(mercuryClient(), 1, 1);
+
+        // seen by the client, so "Phobos" can only come from the "employee" line (the navbar shows "Mercury")
+        mockMvc.perform(get("/orders/" + order.getId()).cookie(mercury))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("Phobos")));
     }
 
     @Test
